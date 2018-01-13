@@ -1,0 +1,88 @@
+* {
+	padding:0;
+	margin:0;
+	list-style:none;
+}
+.wrapper {
+	background:#eee;
+	height:620px;
+	width:800px;
+	border:1px solid black;
+	margin:0 auto;
+}
+.wrapper .head {
+	height:50px;
+	text-align: center;
+	line-height: 50px;
+	font-size: 18px;
+	color:red;
+}
+.wrapper .dominator {
+	position:relative;
+	height:100px;
+	border:1px solid black;
+	border-right:none;
+	border-left:none;
+}
+.wrapper .dominator .choice {
+	position:absolute;
+	width:200px;
+	left:0;
+}
+.dominator .choice span {
+	float:left;
+	height:30px;
+	line-height: 30px;
+	text-align: center;
+	width:50px;
+	cursor:pointer;
+	margin-left: 10px;
+	margin-top: 33px;
+	border:1px solid black;
+}
+.dominator .choice .active {
+	background:#abf;
+}
+.wrapper .dominator .time {
+	position:absolute;
+	border:1px solid black;
+	margin-top:33px;
+	margin-right: 10px;
+	height:30px;
+	line-height: 30px;
+	text-align: center;
+	width:100px;
+	right:0;
+}
+.dominator .numberDiv {
+	margin:40px 200px 50px 360px;
+}
+.dominator .number .flag {
+	margin-left:10px;
+}
+.wrapper .field {
+	margin:0 auto;
+	margin-top:10px;
+	height:400px;
+	width:400px;
+	border-collapse: collapse;
+	border:1px solid black;
+}
+.wrapper .field li {
+	float:left;
+	width:18px;
+	height:18px;
+	border:1px solid black;
+}
+
+
+
+
+
+
+
+
+
+
+
+

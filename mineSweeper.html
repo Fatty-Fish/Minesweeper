@@ -1,0 +1,304 @@
+<html>
+<head>
+<meta charset = "utf-8">
+<title>扫雷</title>
+<link href = "./mineSweeper.css" rel = "stylesheet">
+</head>
+<body>	
+<div class = "wrapper">
+	<div class = "head">扫雷</div>
+	<div class = "dominator">
+		<div class = "choice">
+			<span>易</span>
+			<span>中</span>
+			<span>难</span>
+		</div>
+		<div class = "time">
+			计时0秒
+		</div>
+		<div class= "numberDiv"><span class = "number">雷数0</span> <span class = "flag">旗数0</span></div>
+	</div>
+	<ul class = "field">
+
+	</ul>
+</div>
+<script>
+document.oncontextmenu = function () {
+	return false;
+}
+var manager = {
+	init: function () {
+		this.makeTable();
+		this.changeDegree();
+		this.addtime;
+		this.rowArr = [];
+		this.dataArr = [];
+		this.targetArr = [];
+	},
+	makeTable: function () {
+		var table = document.getElementsByTagName("ul")[0];
+		for (var i = 0; i < 20; i++) {
+			for (var j = 0; j < 20; j++) {
+				var td = document.createElement("li");
+				td.className = "tr" + i + "td" + j;
+				td.count = 0;
+				td.mine = 0;
+				td.seen = 0;
+				td.flag = 0;
+				table.appendChild(td);
+			}
+		}
+	},
+	changeDegree: function () {
+		var oDiv = document.getElementsByClassName("choice")[0];
+		var oNumber = document.getElementsByClassName("number")[0];
+		oDiv.onclick = function (event) {
+			var e = event || window.event;
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].className = "";
+			}
+			if (e.target == this.children[0]) {
+				manager.makeMine(5);
+				oNumber.innerText = "雷数5"
+				e.target.className = "active";
+			}else if (e.target == this.children[1]) {
+				manager.makeMine(10);
+				oNumber.innerText = "雷数10"
+				e.target.className = "active";
+			} else {
+				manager.makeMine(15);
+				oNumber.innerText = "雷数15"
+				e.target.className = "active";
+			}
+			manager.timer();
+			manager.tableClick();
+		}
+	},
+	makeMine: function (number) {
+		for (var i = 0; i < number; i++) {
+			var row = parseInt(Math.random() * 19);
+			var data = parseInt(Math.random() * 19);
+			var target = document.getElementsByClassName("tr" + row + "td" + data)[0];
+			if (!target.mine) {
+				target.mine = 1;
+				this.rowArr.push(row);
+				this.dataArr.push(data);
+				this.targetArr.push(target);
+			}else {
+				i -= 1;
+			}
+		}
+		this.makeClue(this.rowArr, this.dataArr);
+		console.log(this.targetArr)
+	},
+	makeClue: function (rowArr, dataArr) {
+		for (var j = 0; j < rowArr.length; j++) {
+			var arr = [];
+			var xsz = rowArr[j] -1;
+			var ysz = dataArr[j] - 1;
+			var target = document.getElementsByClassName("tr" + xsz + "td" + ysz)[0];
+			arr.push(target);
+			var xs = rowArr[j] -1;
+			var ys = dataArr[j];
+			var target = document.getElementsByClassName("tr" + xs + "td" + ys)[0];
+			arr.push(target);
+			var xsy = rowArr[j] -1;
+			var ysy = dataArr[j] + 1;
+			var target = document.getElementsByClassName("tr" + xsy + "td" + ysy)[0];
+			arr.push(target);
+			var xz = rowArr[j];
+			var yz = dataArr[j] - 1;
+			var target = document.getElementsByClassName("tr" + xz + "td" + yz)[0];
+			arr.push(target);
+			var xy = rowArr[j];
+			var yy = dataArr[j] + 1;
+			var target = document.getElementsByClassName("tr" + xy + "td" + yy)[0];
+			arr.push(target);
+			var xxz = rowArr[j] + 1;
+			var yxz = dataArr[j] - 1;
+			var target = document.getElementsByClassName("tr" + xxz + "td" + yxz)[0];
+			arr.push(target);
+			var xx = rowArr[j] + 1;
+			var yx = dataArr[j];
+			var target = document.getElementsByClassName("tr" + xx + "td" + yx)[0];
+			arr.push(target);
+			var xxy = rowArr[j] + 1;
+			var yxy = dataArr[j] + 1;
+			var target = document.getElementsByClassName("tr" + xxy + "td" + yxy)[0];
+			arr.push(target);
+			for (var n = 0; n < arr.length; n++) {
+				if (arr[n]) {
+					if (!arr[n].mine) {
+						arr[n].count += 1;
+					}else {continue}
+				}
+			}
+		}
+	},
+	timer: function () {
+		var time = 0;
+		clearInterval(this.addtime)
+		this.addtime = setInterval(function () {
+			time++
+			var oTime = document.getElementsByClassName("time")[0];
+			oTime.innerText = "计时"+ time +"秒"
+		} ,1000)
+	},
+	tableClick: function () {
+		var table = document.getElementsByTagName("ul")[0];
+		var flag = document.getElementsByClassName("flag")[0];
+		var flagNum = 0;
+		var flagArr = [];
+		table.onmouseup = function (event) {
+			var e = event || window.event;
+			var tdArr = document.getElementsByTagName("li");
+			if (e.button === 0) {
+				manager.judge(e.target);
+			}else if (e.button === 2) {
+				if (!e.target.flag) {
+					e.target.flag = 1;
+					flagNum += 1;
+					flagArr.push(e.target);
+					e.target.style.background = "red";
+					flag.innerText = "旗数" + flagNum;
+					e.target.innerText = "?";
+				}else {
+					e.target.flag = 0;
+					flagNum -= 1;
+					for (var x = 0; x < flagArr.length; x++) {
+						if (e.target == flagArr[x]) {
+							flagArr.splice(x, 1);
+						}
+					}
+					e.target.style.background = "#eee";
+					flag.innerText = "旗数" + flagNum;
+					e.target.innerText = "";
+				}
+				if (flagNum == manager.targetArr.length) {
+					for (var n = 0; n < flagArr.length; n++) {
+						if (!(flagArr[n].mine && flagArr[n].flag)) {					
+							clearInterval(manager.addtime)
+							alert("不好意思，未找到所有雷！")
+							flagNum = null;
+							table.onmouseup = null;
+							for (var j = 0; j < manager.targetArr.length; j++) {
+								manager.targetArr[j].innerText = "雷";
+							}
+							for (var m = 0; m < tdArr.length; m++) {
+								tdArr[m].style.background = "white";
+								if (tdArr[m].count) {
+									tdArr[m].innerText = tdArr[m].count;
+								}
+								if (tdArr[m].flag) {
+									tdArr[m].style.background = "red";
+								}
+							}
+							break;
+						}else {continue}
+					}
+				}
+				if (flagNum == manager.targetArr.length) {
+					clearInterval(manager.addtime)
+					alert("恭喜，找到所有雷！")
+					table.onmouseup = null;
+					for (var m = 0; m < tdArr.length; m++) {
+						tdArr[m].style.background = "white";
+						if (tdArr[m].count) {
+							tdArr[m].innerText = tdArr[m].count;
+						}
+					}
+					for (var j = 0; j < manager.targetArr.length; j++) {
+						manager.targetArr[j].innerText = "雷";
+						manager.targetArr[j].style.background = "red";
+					}
+				}
+			}
+		}
+	},
+	judge: function (button) {
+		var tdArr = document.getElementsByTagName("li");
+		var table = document.getElementsByTagName("ul")[0];
+		if (button.mine) {//mineTouching
+			clearInterval(this.addtime);
+			alert("踩到雷了！")
+			table.onmouseup = null;
+			for (var j = 0; j < this.targetArr.length; j++) {
+				this.targetArr[j].innerText = "雷";
+			}
+			for (var m = 0; m < tdArr.length; m++) {
+				tdArr[m].style.background = "white";
+				if (tdArr[m].count) {
+					tdArr[m].innerText = tdArr[m].count;
+				}
+			}
+		}else if (button.count) {//countTouching
+			button.style.background = "white";
+			button.innerText = button.count;
+			button.seen += 1;
+		}else {
+			button.seen = 1;
+			this.getClue(button);
+		}
+	},
+	getClue: function (origin) {
+		origin.style.background = "white";
+		var nameStr = origin.className;
+		var reg = /\d+/g;
+		var row = nameStr.match(reg)[0];
+		var data = nameStr.match(reg)[1];
+		var arr = [];
+		var xsz = parseInt(row) -1;
+		var ysz = parseInt(data) - 1;
+		var targetsz = document.getElementsByClassName("tr" + xsz + "td" + ysz)[0];
+		arr.unshift(targetsz);
+		var xs = parseInt(row) -1;
+		var ys = parseInt(data);
+		var targets = document.getElementsByClassName("tr" + xs + "td" + ys)[0];
+		arr.unshift(targets);
+		var xsy = parseInt(row) -1;
+		var ysy = parseInt(data) + 1;
+		var targetsy = document.getElementsByClassName("tr" + xsy + "td" + ysy)[0];
+		arr.unshift(targetsy);
+		var xz = parseInt(row);
+		var yz = parseInt(data) - 1;
+		var targetz = document.getElementsByClassName("tr" + xz + "td" + yz)[0];
+		arr.unshift(targetz);
+		var xy = parseInt(row);
+		var yy = parseInt(data) + 1;
+		var targety = document.getElementsByClassName("tr" + xy + "td" + yy)[0];
+		arr.unshift(targety);
+		var xxz = parseInt(row) + 1;
+		var yxz = parseInt(data) - 1;
+		var targetxz = document.getElementsByClassName("tr" + xxz + "td" + yxz)[0];
+		arr.unshift(targetxz);
+		var xx = parseInt(row) + 1;
+		var yx= parseInt(data);
+		var targetx = document.getElementsByClassName("tr" + xx + "td" + yx)[0];
+		arr.unshift(targetx);
+		var xxy = parseInt(row) + 1;
+		var yxy = parseInt(data) + 1;
+		var targetxy = document.getElementsByClassName("tr" + xxy + "td" + yxy)[0];
+		arr.unshift(targetxy);
+		arr.splice(arr.length - 1, 1);
+		arr.forEach(function (ele, index) {
+			if (ele) {
+				if (!ele.seen) {
+					ele.seen = 1;
+					if (ele.count) {
+						ele.innerText = ele.count;
+						ele.style.background = "white";
+					}else {
+						manager.getClue(ele)
+					}
+				}	
+			}
+		})
+	}
+
+}
+
+manager.init();
+
+</script>
+</body>
+</html>
